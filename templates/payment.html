@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .bill-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        
+        .bill-item:last-child {
+            border-bottom: none;
+        }
+        
+        .bill-item .quantity {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .total-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .qr-section {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .qr-code {
+            margin: 20px auto;
+            display: block;
+            width: 150px; /* Reduced width */
+            height: 150px; /* Reduced height */
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="text-center mb-5">Payment</h1>
+        <div class="card">
+            <div class="card-header">
+                Your Order
+            </div>
+            <div class="card-body">
+                <div class="bill">
+                    {% for order in orders %}
+                    <div class="bill-item">
+                        <div class="d-flex justify-content-between">
+                            <span>{{ order.product_name }}</span>
+                            <span>Rs {{ order.total_price }}</span>
+                        </div>
+                        <div class="quantity">Quantity: {{ order.quantity }} - Customizations: {{ order.customizations }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <span>Total Amount:</span>
+                    <span class="total-amount">Rs {{ total_amount }}</span>
+                </div>
+            </div>
+        </div>
+        <form method="POST" action="{{ url_for('process_payment') }}" class="mt-4">
+            <div class="form-group">
+                <label for="payment-method">Payment Method:</label>
+                <select class="form-control" id="payment-method" name="payment_method" required onchange="handlePaymentMethodChange()">
+                    <option value="credit_card">Credit Card</option>
+                    <option value="debit_card">Debit Card</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="qr_code">QR Code</option>
+                </select>
+            </div>
+            <div id="qr-section" class="qr-section">
+                <h2>Scan QR Code to Pay</h2>
+                <img src="{{ url_for('static', filename='a.jpeg') }}" alt="QR Code" class="qr-code">
+            </div>
+            <button type="submit" class="btn btn-success btn-block">Pay Now</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function handlePaymentMethodChange() {
+            var paymentMethod = document.getElementById('payment-method').value;
+            var qrSection = document.getElementById('qr-section');
+            if (paymentMethod === 'qr_code') {
+                qrSection.style.display = 'block';
+            } else {
+                qrSection.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

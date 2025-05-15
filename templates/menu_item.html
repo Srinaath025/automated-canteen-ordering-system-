@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .food-item {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .food-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .food-item img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        .food-item h5 {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        
+        .food-item p {
+            margin-bottom: 10px;
+        }
+        
+        .food-item .price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .food-item .quantity {
+            margin-bottom: 15px;
+        }
+        
+        .food-item .customizations {
+            margin-bottom: 20px;
+        }
+        
+        .food-item .customizations label {
+            font-weight: normal;
+        }
+        
+        .food-item .btn-order {
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+        
+        .food-item .btn-order:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-proceed {
+            background-color: #28a745;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-proceed:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="text-center mb-5">South Indian Food Menu</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="food-item">
+                    <img src="https://m.economictimes.com/thumb/msid-99118050,width-1200,height-900,resizemode-4,imgsize-64776/idli_istock.jpg" alt="Idli">
+                    <h5>Idli</h5>
+                    <p>Steamed rice cakes served with sambar and chutney.</p>
+                    <p class="price">Rs 4.99</p>
+                    <form method="POST" action="{{ url_for('order') }}">
+                        <div class="quantity">
+                            <label for="idli-quantity">Quantity:</label>
+                            <input type="number" id="idli-quantity" name="quantity" min="0" value="0" class="form-control">
+                        </div>
+                        <div class="customizations">
+                            <div class="form-group">
+                                <label for="idli-custom-customizations">Custom Customizations:</label>
+                                <input type="text" id="idli-custom-customizations" name="customizations" class="form-control" placeholder="Enter custom customizations">
+                            </div>
+                        </div>
+                        <input type="hidden" name="productName" value="Idli">
+                        <input type="hidden" name="price" value="4.99">
+                        <button type="submit" class="btn btn-order btn-block">Order Now</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="food-item">
+                    <img src="https://www.awesomecuisine.com/wp-content/uploads/2009/06/Plain-Dosa.jpg" alt="Dosa">
+                    <h5>Dosa</h5>
+                    <p>Thin crispy crepes made from fermented rice and lentil batter.</p>
+                    <p class="price">Rs 5.99</p>
+                    <form method="POST" action="{{ url_for('order') }}">
+                        <div class="quantity">
+                            <label for="dosa-quantity">Quantity:</label>
+                            <input type="number" id="dosa-quantity" name="quantity" min="0" value="0" class="form-control">
+                        </div>
+                        <div class="customizations">
+                            <div class="form-group">
+                                <label for="dosa-custom-customizations">Custom Customizations:</label>
+                                <input type="text" id="dosa-custom-customizations" name="customizations" class="form-control" placeholder="Enter custom customizations">
+                            </div>
+                        </div>
+                        <input type="hidden" name="productName" value="Dosa">
+                        <input type="hidden" name="price" value="5.99">
+                        <button type="submit" class="btn btn-order btn-block">Order Now</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="food-item">
+                    <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2021/08/ven-pongal.jpg.webp" alt="Pongal">
+                    <h5>Pongal</h5>
+                    <p>A savory rice and lentil dish, seasoned with spices and ghee.</p>
+                    <p class="price">Rs 6.99</p>
+                    <form method="POST" action="{{ url_for('order') }}">
+                        <div class="quantity">
+                            <label for="pongal-quantity">Quantity:</label>
+                            <input type="number" id="pongal-quantity" name="quantity" min="0" value="0" class="form-control">
+                        </div>
+                        <div class="customizations">
+                            <div class="form-group">
+                                <label for="pongal-custom-customizations">Custom Customizations:</label>
+                                <input type="text" id="pongal-custom-customizations" name="customizations" class="form-control" placeholder="Enter custom customizations">
+                            </div>
+                        </div>
+                        <input type="hidden" name="productName" value="Pongal">
+                        <input type="hidden" name="price" value="6.99">
+                        <button type="submit" class="btn btn-order btn-block">Order Now</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ url_for('checkout') }}" class="btn btn-proceed btn-lg">Proceed to Payment</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
