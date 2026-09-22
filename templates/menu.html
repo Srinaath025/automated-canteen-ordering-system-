@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Canteen Menu - CanteenFlow{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Hero Banner -->
+    <div class="canteen-hero">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-warning text-dark px-3 py-1 mb-2 rounded-pill fw-semibold">
+                    <i class="fa-solid fa-sparkles me-1"></i> Hot & Fresh Today
+                </span>
+                <h1 class="hero-title">Welcome, {{ username }}!</h1>
+                <p class="hero-subtitle">
+                    Skip the counter queue. Select your favorite South Indian dishes, customize your order, and pick it up hot from the counter when ready.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="d-inline-flex flex-column gap-2 text-start bg-white bg-opacity-10 p-3 rounded-3 border border-white border-opacity-25">
+                    <div class="small text-white-50"><i class="fa-solid fa-clock text-warning me-2"></i>Service Hours: 7:30 AM - 9:00 PM</div>
+                    <div class="small text-white-50"><i class="fa-solid fa-bolt text-warning me-2"></i>Avg Prep Time: 5 - 10 Mins</div>
+                    <div class="small text-white-50"><i class="fa-solid fa-qrcode text-warning me-2"></i>UPI, Card & Cash Accepted</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div class="category-bar">
+        <a href="{{ url_for('menu') }}" class="category-chip {% if not selected_category or selected_category == 'All' %}active{% endif %}">
+            <i class="fa-solid fa-utensils me-1"></i> All Dishes
+        </a>
+        <a href="{{ url_for('menu', category='Breakfast & Tiffin') }}" class="category-chip {% if selected_category == 'Breakfast & Tiffin' %}active{% endif %}">
+            <i class="fa-solid fa-bread-slice me-1"></i> Breakfast & Tiffin
+        </a>
+        <a href="{{ url_for('menu', category='Lunch & Meals') }}" class="category-chip {% if selected_category == 'Lunch & Meals' %}active{% endif %}">
+            <i class="fa-solid fa-plate-wheat me-1"></i> Lunch & Meals
+        </a>
+        <a href="{{ url_for('menu', category='Beverages') }}" class="category-chip {% if selected_category == 'Beverages' %}active{% endif %}">
+            <i class="fa-solid fa-mug-hot me-1"></i> Beverages
+        </a>
+    </div>
+
+    <!-- Dishes Grid -->
+    <div class="menu-grid">
+        {% for item in items %}
+        <div class="food-card">
+            <div class="food-img-wrap">
+                <img src="{{ item.image_url }}" alt="{{ item.name }}" class="food-img" 
+                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';">
+                {% if item.is_veg %}
+                    <span class="veg-badge">
+                        <i class="fa-solid fa-circle text-success" style="font-size: 8px;"></i> Pure Veg
+                    </span>
+                {% endif %}
+                <span class="price-tag">₹{{ "%.2f"|format(item.price) }}</span>
+            </div>
+
+            <div class="food-card-body">
+                <h3 class="food-title">{{ item.name }}</h3>
+                <p class="food-desc">{{ item.description }}</p>
+
+                <!-- Add to Tray Form -->
+                <form method="POST" action="{{ url_for('add_to_cart') }}" class="mt-auto">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input type="hidden" name="name" value="{{ item.name }}">
+                    <input type="hidden" name="price" value="{{ item.price }}">
+
+                    <div class="mb-2">
+                        <input type="text" name="customizations" class="form-control form-control-sm" 
+                               placeholder="Custom notes (e.g. extra sambar, mild)" style="font-size: 0.82rem;">
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top">
+                        <div class="qty-stepper">
+                            <button type="button" class="qty-btn qty-minus" aria-label="Decrease">&minus;</button>
+                            <input type="number" name="quantity" class="qty-input" value="1" min="1" max="20" readonly>
+                            <button type="button" class="qty-btn qty-plus" aria-label="Increase">&plus;</button>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary-custom py-2 px-3 flex-grow-1" style="font-size: 0.9rem;">
+                            <i class="fa-solid fa-cart-plus"></i> Add to Tray
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Active Tray Banner if Items Exist -->
+    {% if session.get('cart') and session.get('cart')|length > 0 %}
+    <div class="fixed-bottom p-3" style="z-index: 1020;">
+        <div class="container" style="max-width: 700px;">
+            <div class="bg-dark text-white p-3 rounded-4 shadow-lg d-flex align-items-center justify-content-between border border-secondary">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary p-2 rounded-3 text-white">
+                        <i class="fa-solid fa-bag-shopping fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold fs-6">
+                            {{ session.get('cart')|sum(attribute='quantity') }} item(s) in tray
+                        </div>
+                        <div class="small text-white-50">
+                            Total: <strong class="text-warning">₹{{ "%.2f"|format(session.get('cart')|sum(attribute='total_price')) }}</strong>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ url_for('cart') }}" class="btn btn-warning fw-bold px-4 py-2 rounded-pill">
+                    View Tray & Checkout <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

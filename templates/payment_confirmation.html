@@ -1,39 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Confirmation</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .confirmation {
-            text-align: center;
-            margin-top: 50px;
-        }
-        .confirmation .icon {
-            font-size: 100px;
-            color: green;
-        }
-        .confirmation h2 {
-            margin-top: 20px;
-            font-size: 36px;
-        }
-        .confirmation p {
-            margin-top: 10px;
-            font-size: 18px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="confirmation">
-            <div class="icon">
-                <span>&#10004;</span> <!-- Checkmark symbol -->
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed - CanteenFlow{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="receipt-card">
+        <div class="receipt-header">
+            <div class="display-3 mb-2"><i class="fa-solid fa-circle-check"></i></div>
+            <h2 class="fw-bold mb-1">Order Placed Successfully!</h2>
+            <p class="text-white-50 mb-3">Your order has been transmitted directly to the canteen kitchen display</p>
+            
+            <div class="token-badge">
+                TOKEN: {{ order.order_token }}
             </div>
-            <h2>Payment Successful!</h2>
-            <p>Thank you for your order.</p>
-            <a href="{{ url_for('feedback') }}" class="btn btn-primary mt-3">Leave Feedback</a>
+            <div class="small text-white-50 mt-2">Show this token at the pickup counter</div>
+        </div>
+
+        <div class="p-4">
+            <!-- Timeline Tracker -->
+            <div class="status-timeline">
+                <div class="status-step completed">
+                    <div class="status-dot"><i class="fa-solid fa-check"></i></div>
+                    <div class="small fw-bold">Received</div>
+                </div>
+                <div class="status-step active">
+                    <div class="status-dot"><i class="fa-solid fa-fire-burner"></i></div>
+                    <div class="small fw-bold">Preparing</div>
+                </div>
+                <div class="status-step">
+                    <div class="status-dot"><i class="fa-solid fa-bell-concierge"></i></div>
+                    <div class="small text-muted">Ready</div>
+                </div>
+            </div>
+
+            <!-- Receipt Breakdown -->
+            <h5 class="brand-font mb-3 mt-4 border-bottom pb-2">Order Details</h5>
+            <div class="mb-3">
+                {% for it in items %}
+                <div class="d-flex justify-content-between py-1 small">
+                    <span>{{ it.item_name }} &times; {{ it.quantity }}</span>
+                    <span class="fw-semibold">₹{{ "%.2f"|format(it.total_price) }}</span>
+                </div>
+                {% if it.customizations %}
+                <div class="text-muted small ps-2 fst-italic">&bull; {{ it.customizations }}</div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between py-2 border-top border-bottom fw-bold fs-5 mb-4">
+                <span>Total Paid:</span>
+                <span class="text-primary">₹{{ "%.2f"|format(order.total_amount) }}</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-column gap-2">
+                <a href="{{ url_for('orders') }}" class="btn btn-outline-custom w-100 text-center">
+                    <i class="fa-solid fa-clock-rotate-left me-1"></i> View Order History & Status
+                </a>
+                <a href="{{ url_for('feedback') }}" class="btn btn-primary-custom w-100 text-center">
+                    <i class="fa-solid fa-star me-1"></i> Rate Your Experience / Feedback
+                </a>
+                <a href="{{ url_for('menu') }}" class="btn btn-link text-center text-muted small text-decoration-none">
+                    Back to Canteen Menu
+                </a>
+            </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

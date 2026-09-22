@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - CanteenFlow{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 860px;">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="brand-font mb-1"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>My Orders & Tokens</h1>
+            <p class="text-muted small mb-0">Track your current food tokens and view past canteen orders</p>
+        </div>
+        <a href="{{ url_for('menu') }}" class="btn btn-outline-custom">
+            <i class="fa-solid fa-plus me-1"></i> Order Food
+        </a>
+    </div>
+
+    {% if not orders_data or orders_data|length == 0 %}
+    <div class="text-center py-5 my-4 bg-white rounded-4 border p-5 shadow-sm">
+        <i class="fa-solid fa-receipt display-2 text-secondary opacity-25 mb-3"></i>
+        <h3 class="brand-font">No Orders Found</h3>
+        <p class="text-muted mb-4">You have not placed any canteen orders yet.</p>
+        <a href="{{ url_for('menu') }}" class="btn btn-primary-custom px-4 py-2 w-auto">
+            <i class="fa-solid fa-utensils me-2"></i> Place Your First Order
+        </a>
+    </div>
+    {% else %}
+        {% for entry in orders_data %}
+        {% set ord = entry['order'] %}
+        {% set order_items = entry['items'] %}
+        <div class="bg-white rounded-4 border shadow-sm p-4 mb-3">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 pb-3 border-bottom">
+                <div>
+                    <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill me-2">TOKEN: {{ ord.order_token }}</span>
+                    <span class="badge bg-light text-dark border">{{ ord.status }}</span>
+                </div>
+                <div class="text-muted small">
+                    <i class="fa-regular fa-clock me-1"></i> {{ ord.created_at }}
+                </div>
+            </div>
+
+            <div class="py-3">
+                {% for it in order_items %}
+                <div class="d-flex justify-content-between align-items-center py-1">
+                    <div>
+                        <span class="fw-semibold">{{ it.item_name }}</span>
+                        <span class="text-muted small">&times; {{ it.quantity }}</span>
+                        {% if it.customizations %}
+                        <span class="badge bg-light text-muted border ms-2 small">{{ it.customizations }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="fw-semibold">₹{{ "%.2f"|format(it.total_price) }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top flex-wrap gap-2">
+                <div class="small text-muted">
+                    Method: <span class="fw-semibold text-dark text-capitalize">{{ ord.payment_method.replace('_', ' ') }}</span>
+                </div>
+                <div class="fs-5 fw-bold">
+                    Total: <span class="text-primary">₹{{ "%.2f"|format(ord.total_amount) }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,101 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .bill-item {
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
-        }
-        
-        .bill-item:last-child {
-            border-bottom: none;
-        }
-        
-        .bill-item .quantity {
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .total-amount {
-            font-size: 24px;
-            font-weight: bold;
-            color: #007bff;
-        }
+{% extends 'base.html' %}
 
-        .qr-section {
-            text-align: center;
-            margin-top: 20px;
-            display: none;
-        }
+{% block title %}Checkout & Payment - CanteenFlow{% endblock %}
 
-        .qr-code {
-            margin: 20px auto;
-            display: block;
-            width: 150px; /* Reduced width */
-            height: 150px; /* Reduced height */
-        }
-    </style>
-</head>
-<body>
-    <div class="container my-5">
-        <h1 class="text-center mb-5">Payment</h1>
-        <div class="card">
-            <div class="card-header">
-                Your Order
-            </div>
-            <div class="card-body">
-                <div class="bill">
-                    {% for order in orders %}
-                    <div class="bill-item">
-                        <div class="d-flex justify-content-between">
-                            <span>{{ order.product_name }}</span>
-                            <span>Rs {{ order.total_price }}</span>
+{% block content %}
+<div class="container py-4" style="max-width: 900px;">
+    <div class="mb-4 text-center">
+        <h1 class="brand-font"><i class="fa-solid fa-credit-card text-primary me-2"></i>Checkout & Payment</h1>
+        <p class="text-muted small">Choose your preferred payment method to place your kitchen order</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Order Breakdown -->
+        <div class="col-md-5 order-md-2">
+            <div class="summary-card">
+                <h4 class="brand-font mb-3">Order Summary</h4>
+                
+                <div class="bill mb-3">
+                    {% for item in orders %}
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div>
+                            <div class="fw-semibold">{{ item.name }} &times; {{ item.quantity }}</div>
+                            {% if item.customizations %}
+                            <div class="text-muted small italic">{{ item.customizations }}</div>
+                            {% endif %}
                         </div>
-                        <div class="quantity">Quantity: {{ order.quantity }} - Customizations: {{ order.customizations }}</div>
+                        <div class="fw-bold">₹{{ "%.2f"|format(item.total_price) }}</div>
                     </div>
                     {% endfor %}
                 </div>
-                <div class="d-flex justify-content-between mt-4">
-                    <span>Total Amount:</span>
-                    <span class="total-amount">Rs {{ total_amount }}</span>
+
+                <div class="summary-row total">
+                    <span>Grand Total:</span>
+                    <span class="text-primary">₹{{ "%.2f"|format(total_amount) }}</span>
                 </div>
             </div>
         </div>
-        <form method="POST" action="{{ url_for('process_payment') }}" class="mt-4">
-            <div class="form-group">
-                <label for="payment-method">Payment Method:</label>
-                <select class="form-control" id="payment-method" name="payment_method" required onchange="handlePaymentMethodChange()">
-                    <option value="credit_card">Credit Card</option>
-                    <option value="debit_card">Debit Card</option>
-                    <option value="paypal">PayPal</option>
-                    <option value="qr_code">QR Code</option>
-                </select>
-            </div>
-            <div id="qr-section" class="qr-section">
-                <h2>Scan QR Code to Pay</h2>
-                <img src="{{ url_for('static', filename='a.jpeg') }}" alt="QR Code" class="qr-code">
-            </div>
-            <button type="submit" class="btn btn-success btn-block">Pay Now</button>
-        </form>
-    </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        function handlePaymentMethodChange() {
-            var paymentMethod = document.getElementById('payment-method').value;
-            var qrSection = document.getElementById('qr-section');
-            if (paymentMethod === 'qr_code') {
-                qrSection.style.display = 'block';
-            } else {
-                qrSection.style.display = 'none';
-            }
-        }
-    </script>
-</body>
-</html>
+        <!-- Payment Method Selection Form -->
+        <div class="col-md-7 order-md-1">
+            <div class="bg-white p-4 rounded-4 border shadow-sm">
+                <h4 class="brand-font mb-3">Select Payment Method</h4>
+
+                <form method="POST" action="{{ url_for('process_payment') }}">
+                    <div class="form-group-custom">
+                        <label for="payment-method" class="form-label-custom">Payment Options:</label>
+                        <select class="form-control-custom" id="payment-method" name="payment_method" required>
+                            <option value="qr_code" selected>📱 UPI QR Code (GPay, PhonePe, Paytm)</option>
+                            <option value="credit_card">💳 Credit / Debit Card</option>
+                            <option value="cash">💵 Pay at Canteen Cash Counter</option>
+                        </select>
+                    </div>
+
+                    <!-- QR Code Section -->
+                    <div id="qr-section" class="qr-card">
+                        <div class="badge bg-warning text-dark px-3 py-1 rounded-pill mb-2 fw-semibold">
+                            <i class="fa-solid fa-qrcode me-1"></i> Scan & Pay UPI
+                        </div>
+                        <p class="small text-muted mb-2">Scan with any UPI app to pay ₹{{ "%.2f"|format(total_amount) }}</p>
+                        <img src="{{ url_for('static', filename='a.jpeg') }}" alt="Canteen QR Code" class="qr-image"
+                             onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=canteen@upi&pn=CanteenFlow&am={{ total_amount }}';">
+                        <div class="small fw-semibold text-secondary">UPI ID: canteen@upi</div>
+                    </div>
+
+                    <!-- Dummy Card Fields Section -->
+                    <div id="card-section" style="display: none;" class="p-3 bg-light rounded-3 border mb-3">
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">Card Number</label>
+                            <input type="text" class="form-control-custom" placeholder="4532 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 1092" maxlength="19">
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label-custom">Expiry Date</label>
+                                <input type="text" class="form-control-custom" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label-custom">CVV</label>
+                                <input type="password" class="form-control-custom" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary-custom w-100 py-3 mt-3 fs-5">
+                        <i class="fa-solid fa-lock me-1"></i> Pay ₹{{ "%.2f"|format(total_amount) }} & Place Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

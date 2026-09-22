@@ -1,79 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback Form</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .feedback-form {
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .feedback-form h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .star-rating {
-            direction: rtl;
-            display: flex;
-            justify-content: flex-end;
-        }
-        .star-rating input[type="radio"] {
-            display: none;
-        }
-        .star-rating label {
-            font-size: 24px;
-            color: #ccc;
-            cursor: pointer;
-        }
-        .star-rating input[type="radio"]:checked ~ label,
-        .star-rating label:hover,
-        .star-rating label:hover ~ label {
-            color: #f39c12;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="feedback-form">
-                    <h1>Provide Feedback</h1>
-                    <form id="feedbackForm">
-                        <div class="form-group">
-                            <label for="itemRating">Rating</label>
-                            <div class="star-rating">
-                                <input type="radio" name="rating" id="rating5" value="5">
-                                <label for="rating5">&#9733;</label>
-                                <input type="radio" name="rating" id="rating4" value="4">
-                                <label for="rating4">&#9733;</label>
-                                <input type="radio" name="rating" id="rating3" value="3">
-                                <label for="rating3">&#9733;</label>
-                                <input type="radio" name="rating" id="rating2" value="2">
-                                <label for="rating2">&#9733;</label>
-                                <input type="radio" name="rating" id="rating1" value="1">
-                                <label for="rating1">&#9733;</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="itemComments">Comments</label>
-                            <textarea class="form-control" id="itemComments" rows="4" placeholder="Enter your comments" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-block">Submit Feedback</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+{% extends 'base.html' %}
+
+{% block title %}Canteen Feedback - CanteenFlow{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 820px;">
+    <div class="text-center mb-4">
+        <h1 class="brand-font"><i class="fa-solid fa-star text-warning me-2"></i>Canteen Feedback & Reviews</h1>
+        <p class="text-muted small">We value your opinion! Tell us about the food quality, taste, and counter service.</p>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+    <div class="bg-white rounded-4 border shadow-sm p-4 p-md-5 mb-5">
+        <h4 class="brand-font mb-4">Share Your Experience</h4>
+
+        <form method="POST" action="{{ url_for('feedback') }}">
+            <!-- Rating Star Selector -->
+            <div class="form-group-custom mb-4">
+                <label class="form-label-custom mb-2">Overall Rating (1 to 5 Stars):</label>
+                <div>
+                    <div class="star-rating">
+                        <input type="radio" name="rating" id="rating5" value="5" checked>
+                        <label for="rating5" title="5 stars">&#9733;</label>
+
+                        <input type="radio" name="rating" id="rating4" value="4">
+                        <label for="rating4" title="4 stars">&#9733;</label>
+
+                        <input type="radio" name="rating" id="rating3" value="3">
+                        <label for="rating3" title="3 stars">&#9733;</label>
+
+                        <input type="radio" name="rating" id="rating2" value="2">
+                        <label for="rating2" title="2 stars">&#9733;</label>
+
+                        <input type="radio" name="rating" id="rating1" value="1">
+                        <label for="rating1" title="1 star">&#9733;</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Textarea -->
+            <div class="form-group-custom mb-4">
+                <label for="feedbackComments" class="form-label-custom">Your Comments / Suggestions:</label>
+                <textarea class="form-control-custom" id="feedbackComments" name="feedback" rows="4" 
+                          placeholder="How was the taste? Was the food served piping hot? Any dish you'd like added to our menu?" required></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary-custom w-100 py-3 fs-6">
+                <i class="fa-solid fa-paper-plane me-1"></i> Submit Feedback
+            </button>
+        </form>
+    </div>
+
+    <!-- Recent Reviews Feed -->
+    {% if recent_feedback and recent_feedback|length > 0 %}
+    <div>
+        <h4 class="brand-font mb-3"><i class="fa-solid fa-comments text-primary me-2"></i>Recent Student & Staff Feedback</h4>
+        <div class="d-flex flex-column gap-3">
+            {% for rev in recent_feedback %}
+            <div class="bg-white p-3 rounded-3 border">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-bold"><i class="fa-solid fa-user-circle text-secondary me-1"></i> {{ rev.username }}</span>
+                    <span class="text-warning">
+                        {% for i in range(rev.rating) %}&#9733;{% endfor %}{% for i in range(5 - rev.rating) %}&#9734;{% endfor %}
+                    </span>
+                </div>
+                <p class="text-muted small mb-1">{{ rev.comments }}</p>
+                <div class="text-muted" style="font-size: 0.75rem;">
+                    {{ rev.created_at }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
