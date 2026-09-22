@@ -76,3 +76,26 @@ Visit **[http://127.0.0.1:5000](http://127.0.0.1:5000)**
 2. Log in and browse the menu.
 3. Add items to your tray, customize instructions, and proceed to checkout.
 4. Scan the QR code or select Cash Counter, place your order, and receive your kitchen token!
+
+---
+
+## Deploy to Render (Cloud Hosting)
+
+This repository is configured for free cloud hosting on [Render](https://render.com).
+
+### Option 1: Automatic Blueprint (Recommended)
+1. Log in to [Render Dashboard](https://dashboard.render.com/).
+2. Click **New +** > **Blueprint**.
+3. Connect your GitHub repository: `https://github.com/Srinaath025/automated-canteen-ordering-system-`.
+4. Render will read `render.yaml` and configure everything automatically. Click **Apply**.
+
+### Option 2: Manual Web Service
+1. Log in to [Render Dashboard](https://dashboard.render.com/) and click **New +** > **Web Service**.
+2. Select your repository `automated-canteen-ordering-system-`.
+3. Fill in the following settings:
+   - **Name**: `canteenflow`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app:app`
+   - **Instance Type**: `Free`
+4. Click **Create Web Service**. Your live URL will be ready in 1-2 minutes!
